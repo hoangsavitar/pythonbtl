@@ -145,7 +145,7 @@ def on_false():
 
 def check_score(answered="wrong"):
     ''' here we check if the answer is right '''
-    global qnum, points
+    global qnum, points, score, title
     print("qnum",qnum)
     # until there are questions (before last)
     # hit.play()  # click sound
@@ -160,8 +160,8 @@ def check_score(answered="wrong"):
         # Change the text of the question
         title.change_text(questions[qnum-1][0], color="cyan")
         # change the question number
-        num_question.change_text("Cau so :" + str(qnum + 1))
-        show_question(qnum)  # delete old buttons and show new
+        num_question.change_text("Cau so :" + str(qnum))
+        show_question(qnum-1)  # delete old buttons and show new
 
     # for the last question...
     elif qnum == len(questions):
@@ -202,16 +202,17 @@ def show_question(qnum):
     #        command=None)
 
     # ============== TEXT: question and answers ====================
-    Button2((500, pos[0]), questions[qnum-1][1][0], 36, "black on white",
+    print(qnum)
+    Button2((500, pos[0]), questions[qnum][1][0], 36, "black on white",
             hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
             command=on_right)
-    Button2((500, pos[1]), questions[qnum-1][1][1], 36, "black on white",
+    Button2((500, pos[1]), questions[qnum][1][1], 36, "black on white",
             hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
             command=on_false)
-    Button2((500, pos[2]), questions[qnum-1][1][2], 36, "black on white",
+    Button2((500, pos[2]), questions[qnum][1][2], 36, "black on white",
             hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
             command=on_false)
-    Button2((500, pos[3]), questions[qnum-1][1][3], 36, "black on white",
+    Button2((500, pos[3]), questions[qnum][1][3], 36, "black on white",
             hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
             command=on_false)
 
@@ -235,11 +236,16 @@ def start_again():
 
 
 def loop():
-    global game_on
 
+
+    # PLAY_BACK = Button(image=None, pos=(1220, 700),
+    #                     text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
+
+    # # PLAY_BACK.changeColor(PLAY_MOUSE_POS)
+    # PLAY_BACK.update(screen)
     show_question(qnum)
-
     while True:
+        PLAY_MOUSE_POS = pygame.mouse.get_pos()
         screen.fill(0)
         for event in pygame.event.get():  # ====== quit / exit
             if (event.type == pygame.QUIT):
@@ -251,6 +257,21 @@ def loop():
         buttons.draw(screen)
         show_labels()  # update labels
         clock.tick(60)
+        
+
+        PLAY_BACK = Button(image=None, pos=(1220, 700),
+                           text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
+
+        PLAY_BACK.changeColor(PLAY_MOUSE_POS)
+        PLAY_BACK.update(screen)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
+                    main_menu()
         pygame.display.update()
 
 
@@ -258,7 +279,6 @@ def play():
     while True:
         if __name__ == '__main__':
             pygame.init()
-            game_on = 1
             loop()
         PLAY_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -307,6 +327,7 @@ def options():
 
 
 def main_menu():
+    global points, qnum
     while True:
         screen.blit(BG, (0, 0))
 
@@ -334,14 +355,17 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    qnum = 0
+                    points = 0
                     play()
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                     options()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
-
+        kill()
         pygame.display.update()
 
 
 main_menu()
+# play()
