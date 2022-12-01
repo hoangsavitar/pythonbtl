@@ -156,11 +156,11 @@ def check_score(answered="wrong"):
             points += 1
             # Show the score text
         qnum += 1  # counter for next question in the list
-        score.change_text(str(points))
+        score.change_text((name_player + ":" + str(points)) + " point")
         # Change the text of the question
         title.change_text(questions[qnum-1][0], color="cyan")
         # change the question number
-        num_question.change_text(str(qnum))
+        num_question.change_text("Cau so :" + str(qnum + 1))
         show_question(qnum)  # delete old buttons and show new
 
     # for the last question...
@@ -173,6 +173,7 @@ def check_score(answered="wrong"):
         kill()
         title.change_text("And Game", color="cyan")
         score.change_text("You reached a score of " + str(points))
+        num_question.change_text(newtext= "and game")
     time.sleep(.5)
 
 
@@ -222,9 +223,10 @@ def kill():
 
 qnum = 0
 points = 0
+name_player = 'person1'
 # ================= SOME LABELS ==========================
-num_question = Label(screen, str(qnum), 0, 0)
-score = Label(screen, "Hoang", 50, 300)
+num_question = Label(screen,("Cau so :"+ str(qnum + 1)), 0, 0)
+score = Label(screen, name_player, 50, 300)
 title = Label(screen, questions[qnum][0], 400, 100, 55, color="cyan")
 
 
