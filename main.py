@@ -146,10 +146,10 @@ def on_false():
 def check_score(answered="wrong"):
     ''' here we check if the answer is right '''
     global qnum, points
-
+    print("qnum",qnum)
     # until there are questions (before last)
     # hit.play()  # click sound
-    if qnum < len(questions):
+    if qnum < len(questions) :
         print(qnum, len(questions))
         if answered == "right":
             time.sleep(.1)  # to avoid adding more point when pressing too much
@@ -167,9 +167,11 @@ def check_score(answered="wrong"):
     elif qnum == len(questions):
         print(qnum, len(questions))
         if answered == "right":
-            kill()
+            
             time.sleep(.1)
             points += 1
+        kill()
+        title.change_text("And Game", color="cyan")
         score.change_text("You reached a score of " + str(points))
     time.sleep(.5)
 
@@ -223,7 +225,7 @@ points = 0
 # ================= SOME LABELS ==========================
 num_question = Label(screen, str(qnum), 0, 0)
 score = Label(screen, "Hoang", 50, 300)
-title = Label(screen, questions[qnum-1][0], 400, 100, 55, color="cyan")
+title = Label(screen, questions[qnum][0], 400, 100, 55, color="cyan")
 
 
 def start_again():
