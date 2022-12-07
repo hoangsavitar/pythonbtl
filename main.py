@@ -2,17 +2,21 @@ import pygame
 import sys
 import random
 import time
+import pandas as pd
 import pygame.gfxdraw
 from label import *
 from button import Button
 from data import questions
+from utils import save_point
 pygame.init()
-
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 pygame.display.set_caption("Menu")
 
 BG = pygame.image.load("assets/Background.png")
+image2 = pygame.image.load("assets/2.jpg")
+image3 = pygame.image.load("assets/3.jpg")
+image4 = pygame.image.load("assets/4.jpg")
 
 
 def get_font(size):  # Returns Press-Start-2P in the desired size
@@ -98,9 +102,9 @@ class Button2(pygame.sprite.Sprite):
     def draw_button2(self):
         ''' a linear border '''
         # the width is set to 500 to have the same size not depending on the text size
-        pygame.draw.rect(screen, self.bg, (self.x - 50, self.y, 500, self.h))
+        pygame.draw.rect(screen, self.bg, (self.x - 100, self.y, 500, self.h))
         pygame.gfxdraw.rectangle(
-            screen, (self.x - 50, self.y, 500, self.h), self.borderc)
+            screen, (self.x - 100, self.y, 500, self.h), self.borderc)
 
     def check_collision(self):
         if self.rect.collidepoint(pygame.mouse.get_pos()):
@@ -145,11 +149,11 @@ def on_false():
 
 def check_score(answered="wrong"):
     ''' here we check if the answer is right '''
-    global qnum, points, score, title
-    print("qnum",qnum)
+    global qnum, points, score, title, text
+    print("qnum", qnum)
     # until there are questions (before last)
     # hit.play()  # click sound
-    if qnum < len(questions) :
+    if qnum < len(questions):
         print(qnum, len(questions))
         if answered == "right":
             time.sleep(.1)  # to avoid adding more point when pressing too much
@@ -158,28 +162,26 @@ def check_score(answered="wrong"):
         qnum += 1  # counter for next question in the list
         score.change_text((name_player + ":" + str(points)) + " point")
         # Change the text of the question
-        title.change_text(questions[qnum-1][0], color="cyan")
+        title.change_text(questions[qnum-1][0], color="white")
         # change the question number
-        num_question.change_text("Cau so :" + str(qnum))
+        num_question.change_text("Cau so " + str(qnum)+": ")
         show_question(qnum-1)  # delete old buttons and show new
 
     # for the last question...
     elif qnum == len(questions):
         print(qnum, len(questions))
         if answered == "right":
-            
             time.sleep(.1)
             points += 1
         kill()
-        title.change_text("And Game", color="cyan")
-        score.change_text("You reached a score of " + str(points))
-        num_question.change_text(newtext= "and game")
+        # title.change_text("And Game", color="cyan")
+        # score.change_text("You reached a score of " + str(points))
+        # nu-m_question.change_text(newtext="and game")
+        # save_point(name_player=text, point=points)
     time.sleep(.5)
 
 
 def show_question(qnum):
-    ''' put your buttons here '''
-
     # Kills the previous buttons/sprites
     kill()
 
@@ -188,31 +190,18 @@ def show_question(qnum):
     # randomized, so that the right one is not on top
     random.shuffle(pos)
 
-    # Button((10, 100), "1. ", 36, "red on yellow",
-    #        hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
-    #        command=None)
-    # Button((10, 150), "2. ", 36, "red on yellow",
-    #        hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
-    #        command=None)
-    # Button((10, 200), "3. ", 36, "red on yellow",
-    #        hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
-    #        command=None)
-    # Button((10, 250), "4. ", 36, "red on yellow",
-    #        hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
-    #        command=None)
-
     # ============== TEXT: question and answers ====================
     print(qnum)
-    Button2((500, pos[0]), questions[qnum][1][0], 36, "black on white",
+    Button2((450, pos[0]), questions[qnum][1][0], 36, "black on white",
             hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
             command=on_right)
-    Button2((500, pos[1]), questions[qnum][1][1], 36, "black on white",
+    Button2((450, pos[1]), questions[qnum][1][1], 36, "black on white",
             hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
             command=on_false)
-    Button2((500, pos[2]), questions[qnum][1][2], 36, "black on white",
+    Button2((450, pos[2]), questions[qnum][1][2], 36, "black on white",
             hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
             command=on_false)
-    Button2((500, pos[3]), questions[qnum][1][3], 36, "black on white",
+    Button2((450, pos[3]), questions[qnum][1][3], 36, "black on white",
             hover_colors="blue on orange", style="button2", borderc=(255, 255, 0),
             command=on_false)
 
@@ -225,40 +214,106 @@ def kill():
 qnum = 0
 points = 0
 name_player = 'person1'
+text = ''
 # ================= SOME LABELS ==========================
-num_question = Label(screen,("Cau so :"+ str(qnum + 1)), 0, 0)
-score = Label(screen, name_player, 50, 300)
-title = Label(screen, questions[qnum][0], 400, 100, 55, color="cyan")
+num_question = Label(screen, ("Cau so " + str(qnum + 1))+": ", 200, 93, 40)
+score = Label(screen, name_player, 1000, 50, 25, color="cyan")
+title = Label(screen, questions[qnum][0], 350, 100, 35, color="cyan")
 
 
-def start_again():
-    pass
+def show_end(score):
+    global points
+    screen.fill((0, 0, 0))
+    anh = pygame.image.load("assets/victory.jpg")
+    screen.blit(pygame.transform.scale(anh, (1280, 720)), (0, 0))
+    # boxx
+    font = pygame.font.Font(None, 32)
+    clock = pygame.time.Clock()
+    text1 = pygame.font.SysFont('freesanbold.ttf', 50).render(
+        'Nhap ten cua ban', True, (0, 0, 0))
+    screen.blit(text1, (500, 600))
+    text2 = pygame.font.SysFont('freesanbold.ttf', 50).render(
+        'Ban duoc: '+str(points)+'diem', True, (0, 0, 0))
+    screen.blit(text2, (490, 330))
+    input_box = pygame.Rect(500, 650, 280, 40)
+    color_inactive = pygame.Color('lightskyblue3')
+    color_active = pygame.Color('green')
+    color = color_inactive
+    active = False
+    text = ''
+    done = False
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                if input_box.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active = not active
+                else:
+                    active = False
+                # Change the current color of the input box.
+                color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_RETURN:
+                        print(text)
+                        save_point(name_player=text, point=points)
+                        text = ''
+                        main_menu()
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+
+        # Render the current text.
+        txt_surface = font.render(text, True, color)
+        # Resize the box if the text is too long.
+        width = max(300, txt_surface.get_width()+20)
+        input_box.w = width
+        # Blit the text.
+        screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+        # Blit the input_box rect.
+        pygame.draw.rect(screen, color, input_box, 2)
+
+        pygame.display.flip()
+        clock.tick(30)
 
 
 def loop():
-
-
+    global points, qnum
     # PLAY_BACK = Button(image=None, pos=(1220, 700),
     #                     text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
 
     # # PLAY_BACK.changeColor(PLAY_MOUSE_POS)
     # PLAY_BACK.update(screen)
+
     show_question(qnum)
     while True:
         PLAY_MOUSE_POS = pygame.mouse.get_pos()
-        screen.fill(0)
-        for event in pygame.event.get():  # ====== quit / exit
-            if (event.type == pygame.QUIT):
-                pygame.quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
+        screen.blit(BG, (0, 0))
         buttons.update()  # update buttons
         buttons.draw(screen)
+        screen.blit(pygame.transform.scale(image2, (400, 280)), (50, 400))
+        screen.blit(pygame.transform.scale(image3, (400, 280)), (450, 400))
+        screen.blit(pygame.transform.scale(image4, (400, 280)), (850, 400))
+        Button(image=None, pos=(410, 220),
+               text_input="A.", font=get_font(30), base_color="black", hovering_color="Green").update(screen)
+        Button(image=None, pos=(410, 271),
+               text_input="B.", font=get_font(30), base_color="black", hovering_color="Green").update(screen)
+        Button(image=None, pos=(410, 322),
+               text_input="C.", font=get_font(30), base_color="black", hovering_color="Green").update(screen)
+        Button(image=None, pos=(410, 373),
+               text_input="D.", font=get_font(30), base_color="black", hovering_color="Green").update(screen)
         show_labels()  # update labels
         clock.tick(60)
-        
-
+        if qnum == len(questions):
+            show_end(points)
+            points = 0
+            qnum = 0
         PLAY_BACK = Button(image=None, pos=(1220, 700),
                            text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
 
@@ -303,14 +358,15 @@ def options():
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
 
         screen.fill("white")
+        df = pd.read_csv('rank.csv')
+        for i in range(len(df)):
+            OPTIONS_TEXT = get_font(45).render(
+                str(df['name_player'][i]) + " " + str(df['score'][i]), True, "Black")
+            OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(640, 100 + i*100))
+            screen.blit(OPTIONS_TEXT, OPTIONS_RECT)
 
-        OPTIONS_TEXT = get_font(45).render(
-            "This is the OPTIONS screen.", True, "Black")
-        OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(640, 260))
-        screen.blit(OPTIONS_TEXT, OPTIONS_RECT)
-
-        OPTIONS_BACK = Button(image=None, pos=(640, 460),
-                              text_input="BACK", font=get_font(75), base_color="Black", hovering_color="Green")
+        OPTIONS_BACK = Button(image=None, pos=(1220, 700),
+                              text_input="BACK", font=get_font(25), base_color="Black", hovering_color="Green")
 
         OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
         OPTIONS_BACK.update(screen)
@@ -327,6 +383,9 @@ def options():
 
 
 def main_menu():
+    pygame.mixer.music.load(
+        'assets\See-Tình-Remix-Hoàng-Thùy-Linh-Cukak-Remix (mp3cut.net).mp3')
+    pygame.mixer.music.play(-1)
     global points, qnum
     while True:
         screen.blit(BG, (0, 0))
@@ -339,7 +398,7 @@ def main_menu():
         PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(640, 250),
                              text_input="PLAY", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
         OPTIONS_BUTTON = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 400),
-                                text_input="OPTIONS", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+                                text_input="RANKING", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
         QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(640, 550),
                              text_input="QUIT", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
 
@@ -359,6 +418,8 @@ def main_menu():
                     points = 0
                     play()
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    qnum = 0
+                    points = 0
                     options()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
